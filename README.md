@@ -9,6 +9,7 @@ Startercode voor de opdracht Strategy Tank [PRG09]
 **Locale development**
 
 1. Clone deze repository
+2. `npm install`
 2. Start development server met `npm run dev`
 3. Op de url uit de terminal om de game te testen
 
