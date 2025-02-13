@@ -23,7 +23,7 @@ export abstract class Projectile extends GameObject{
         this.rotation       = this.parentTurret.Rotation 
         this.direction      = Vector.getVectorFromAngle(this.rotation)
 
-        // move the bullet in front of the barrel // TODO distance depends on tank.Data.armor
+        // move the bullet in front of the barrel 
         let dist = 30
         this.position = this.Position.add(this.direction.scale(dist))
     }
