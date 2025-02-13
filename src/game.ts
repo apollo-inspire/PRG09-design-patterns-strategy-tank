@@ -1,10 +1,10 @@
-import { Enemy }        from "./enemy.js"
-import { GameObject }   from "./gameobject.js"
-import { Tank }         from "./tank.js"
-import { Vector }       from "./vector.js"
-import { BulletAmmo }   from "./ammo/bulletammo.js"
-import { RocketAmmo }   from "./ammo/rocketammo.js"
-import { MissileAmmo }  from "./ammo/missileammo.js"
+import { Enemy }        from "./classes/enemy"
+import { GameObject }   from "./classes/gameobject"
+import { Tank }         from "./classes/tank"
+import { Vector }       from "./classes/vector"
+import { BulletAmmo }   from "./classes/ammo/bulletammo"
+import { RocketAmmo }   from "./classes/ammo/rocketammo"
+import { MissileAmmo }  from "./classes/ammo/missileammo"
 
 export class Game {
 
