@@ -1,0 +1,95 @@
+classDiagram
+    class GameObject
+
+    class Vector
+
+    class Ammunition {
+        - type: string
+        - position: Vector
+        + onCollision(target: GameObject): void
+    }
+
+    class BulletAmmo
+    class MissileAmmo
+    class RocketAmmo
+
+    class Projectile {
+        - speed: number
+        - direction: Vector
+        + move(): void
+    }
+
+    class Bullet
+    class Missile
+    class Rocket
+
+    class ProjectileStrategy {
+        - fireRate: number
+        - speed: number
+        + createProjectile(Tank): Projectile
+    }
+
+    class BulletStrategy {
+        - fireRate: 500
+        - speed: 12
+        + createProjectile(Tank): Bullet
+    }
+
+    class MissileStrategy {
+        - fireRate: 3000
+        - speed: 6
+        + createProjectile(Tank): Missile
+    }
+
+    class RocketStrategy {
+        - fireRate: 2000
+        - speed: 8
+        + createProjectile(Tank): Rocket
+    }
+
+    class Tank {
+        - health: number
+        - position: Vector
+        + fire(): void
+    }
+
+    class Turret {
+        - angle: number
+        + rotate(): void
+    }
+
+    class Enemy {
+        - health: number
+        - position: Vector
+        + move(): void
+    }
+
+    class Game {
+        + start(): void
+        + update(): void
+    }
+
+    GameObject <|-- Ammunition
+    Ammunition <|-- BulletAmmo
+    Ammunition <|-- MissileAmmo
+    Ammunition <|-- RocketAmmo
+
+    GameObject <|-- Enemy
+
+    Projectile <|-- Bullet
+    Projectile <|-- Missile
+    Projectile <|-- Rocket
+
+    ProjectileStrategy <|-- BulletStrategy
+    ProjectileStrategy <|-- MissileStrategy
+    ProjectileStrategy <|-- RocketStrategy
+
+    BulletStrategy --> Bullet
+    MissileStrategy --> Missile
+    RocketStrategy --> Rocket
+
+    Tank --> Turret : has
+    Tank --> ProjectileStrategy : uses
+
+    Game --> Tank : manages
+    Game --> Enemy : manages

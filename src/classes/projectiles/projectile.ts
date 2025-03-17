@@ -7,7 +7,7 @@ export abstract class Projectile extends GameObject{
     
     // Field 
     private damage       : number = 15
-    private speed        : number = 10
+    private speed        : number;
     private parentTurret : Turret
     private direction    : Vector;
 
@@ -15,9 +15,10 @@ export abstract class Projectile extends GameObject{
     public get Damage()         : number        { return this.damage }
     public get ParentTurret()   : GameObject    { return this.parentTurret }
     
-    constructor(type: string, tank : Tank) {
+    constructor(type: string, tank : Tank, speed: number) {
         super(type)
 
+        this.speed = speed;
         this.parentTurret   = tank.Turret
         this.position       = this.parentTurret.Position
         this.rotation       = this.parentTurret.Rotation 
@@ -29,7 +30,7 @@ export abstract class Projectile extends GameObject{
     }
 
     public update() {
-        this.position = this.Position.add(this.direction.scale(this.speed))
+        this.position = this.Position.add(this.direction.scale(this.speed));
         super.update();
 
     }

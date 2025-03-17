@@ -9,7 +9,7 @@ import { Vector }       from "./vector";
 export class Enemy extends GameObject {
     
     // Fields 
-    private speed: number = 1
+    private speed: number = 0.5
     private game: Game
     private player: Tank
     private type: string

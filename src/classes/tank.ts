@@ -1,3 +1,5 @@
+import { ProjectileStrategy } from "./projectiles/ProjectileStrategy";
+import { BulletStrategy } from "./projectiles/BulletStrategy";
 import { Bullet }           from "./projectiles/bullet";
 import { Game }             from "../game";
 import { GameObject }       from "./gameobject";
@@ -5,16 +7,19 @@ import { Turret }           from "./turret";
 import { Vector }           from "./vector";
 
 export class Tank extends GameObject {
-    private readonly FRICTION       : number    = 0.3  
-    private readonly ACCELERATION   : number    = 0.2  
+    private currentProjectileStrategy: ProjectileStrategy;
+
+    private readonly FRICTION       : number    = 0.001  
+    private readonly ACCELERATION   : number    = 0.1  
 
     // Fields 
     private turnLeft        : boolean   = false
     private turnRight       : boolean   = false
     private accelerate      : boolean   = false
+    private backaccelerate  : boolean   = false
     private canFire         : boolean   = true
     private previousState   : boolean   = false
-    private rotationSpeed   : number    = 2
+    private rotationSpeed   : number    = 1
     private turret          : Turret
     private game            : Game
     private fireRate        : number    = 100
@@ -27,6 +32,7 @@ export class Tank extends GameObject {
     
     constructor(game:Game) {
         super("tank-body")
+        this.currentProjectileStrategy = new BulletStrategy(); // Start met Bullet
 
         this.game       = game
         this.position.x = visualViewport.width / 2
@@ -44,21 +50,41 @@ export class Tank extends GameObject {
     public update() {
         this.turret.update()
 
+        // console.log(this.backaccelerate)
+        // console.log(this.speed.x, this.speed.y)
+
         // handle rotation if active
         if(this.turnLeft)       this.rotation -= this.rotationSpeed
         else if(this.turnRight) this.rotation += this.rotationSpeed
 
-        // handle movement if active
-        if(this.accelerate)     {
-            if(this.speed.x < 5) this.speed.x += this.ACCELERATION
-            if(this.speed.y < 5) this.speed.y += this.ACCELERATION
-        } else {
-            // slow down the tank if not accelerating 
-            if (this.speed.x > 0) this.speed.x -= this.FRICTION
-            if (this.speed.y > 0) this.speed.y -= this.FRICTION
-        }        
-        if (this.speed.x < 0) this.speed.x = 0
-        if (this.speed.y < 0) this.speed.y = 0
+        // Handle forward movement
+        if (this.accelerate) {
+            if (this.speed.x < 3) this.speed.x +=  this.ACCELERATION;
+            if (this.speed.y < 3) this.speed.y +=  this.ACCELERATION;
+        } else if (!this.backaccelerate) {
+        // } else {
+            // Apply friction when not accelerating
+            if (this.speed.x > 0) this.speed.x -= this.FRICTION;
+            if (this.speed.y > 0) this.speed.y -= this.FRICTION;
+            if (this.speed.x < 0.05) this.speed.x = 0;
+            if (this.speed.y < 0.05) this.speed.y = 0;
+        }
+     
+
+        // Handle backward movement
+        if (this.backaccelerate) {
+            if (this.speed.x > -3) this.speed.x -= this.ACCELERATION;
+            if (this.speed.y > -3) this.speed.y -= this.ACCELERATION;
+        } else if (!this.accelerate) {
+        //     // Apply friction when not reversing
+            if (this.speed.x < 0) this.speed.x += this.FRICTION;
+            if (this.speed.y < 0) this.speed.y += this.FRICTION;
+            if (this.speed.x > -0.05) this.speed.x = 0;
+            if (this.speed.y > -0.05) this.speed.y = 0;
+        }
+
+        if (this.speed.x == 0) this.speed.x = 0
+        if (this.speed.y == 0) this.speed.y = 0
                     
         this.position.x += Math.cos(this.degToRad(this.rotation)) * this.speed.x
         this.position.y += Math.sin(this.degToRad(this.rotation)) * this.speed.y
@@ -69,32 +95,41 @@ export class Tank extends GameObject {
     }
 
     private handleKeyDown(e : KeyboardEvent) {
-        if(e.key == "ArrowLeft")        this.turnLeft   = true
-        else if (e.key == "ArrowRight") this.turnRight  = true
+        if(e.key == "ArrowLeft" || e.key == "a")        this.turnLeft   = true
+        else if (e.key == "ArrowRight"|| e.key == "d") this.turnRight  = true
         
-        if(e.key == "ArrowUp")          this.accelerate = true
+        
+        if(e.key == "ArrowUp" || e.key === "w")          this.accelerate = true
+        if(e.key == "ArrowDown" || e.key === "s")          this.backaccelerate = true
 
-        if(e.key == " ")                this.fire()
+        if(e.key == " " || e.key === "Enter")                this.fire()
     }
     
     private handleKeyUp(e : KeyboardEvent) {
-        if(e.key == "ArrowLeft")        this.turnLeft   = false
-        else if (e.key == "ArrowRight") this.turnRight  = false
+        if(e.key == "ArrowLeft" || e.key == "a")        this.turnLeft   = false
+        else if (e.key == "ArrowRight" || e.key == "d") this.turnRight  = false
 
-        if(e.key == "ArrowUp")          this.accelerate = false
+        if(e.key == "ArrowUp" || e.key == "w")          this.accelerate = false
+        if(e.key == "ArrowDown" || e.key == "s")          this.backaccelerate = false
 
-        if(e.key == " ")                this.previousState = false    
+        if(e.key == " " || e.key == "Enter")                this.previousState = false    
     }
 
     private fire() {
-        if(this.canFire && !this.previousState) {
-            this.game.gameObjects.push(new Bullet(this))
-            this.previousState = true
-            this.canFire = false
+        if (this.canFire) {
+            let projectile = this.currentProjectileStrategy.fire(this);
             
-            // Timer for the fire rate
-            setTimeout(() => { this.canFire = true }, this.fireRate)
+            if (projectile) {  
+                this.game.gameObjects.push(projectile);
+            }
+    
+            this.canFire = false;
+            setTimeout(() => { this.canFire = true }, this.fireRate);
         }
+    }
+
+    public changeAmmo(strategy: ProjectileStrategy) {
+        this.currentProjectileStrategy = strategy;
     }
 
     onCollision(target: GameObject): void {

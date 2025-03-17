@@ -2,9 +2,14 @@ import { Enemy }        from "./classes/enemy"
 import { GameObject }   from "./classes/gameobject"
 import { Tank }         from "./classes/tank"
 import { Vector }       from "./classes/vector"
-import { BulletAmmo }   from "./classes/ammo/bulletammo"
-import { RocketAmmo }   from "./classes/ammo/rocketammo"
-import { MissileAmmo }  from "./classes/ammo/missileammo"
+import { Ammo }   from "./classes/ammo/ammo"
+import { BulletStrategy }   from "./classes/projectiles/BulletStrategy"
+import { RocketStrategy }   from "./classes/projectiles/RocketStrategy"
+import { MissileStrategy }   from "./classes/projectiles/MissileStrategy"
+// import { MissileAmmo } from "./classes/ammo/missileammo"
+// import { BulletAmmo }   from "./classes/ammo/bulletammo"
+// import { RocketAmmo }   from "./classes/ammo/rocketammo"
+// import { MissileAmmo }  from "./classes/ammo/missileammo"
 
 export class Game {
 
@@ -12,9 +17,9 @@ export class Game {
     public gameObjects: GameObject[] = []
 
     constructor() {
-        this.gameObjects.push(new BulletAmmo(new Vector(800, 200)))
-        this.gameObjects.push(new RocketAmmo(new Vector(500, 200)))
-        this.gameObjects.push(new MissileAmmo(new Vector(500, 500)))
+        this.gameObjects.push(new Ammo("ammo-bullet", new Vector(500, 500), new BulletStrategy()));
+        this.gameObjects.push(new Ammo("ammo-rocket", new Vector(200, 200), new RocketStrategy()));
+        this.gameObjects.push(new Ammo("ammo-missile",new Vector(100, 100), new MissileStrategy()))
         
         let tank = new Tank(this)
         this.gameObjects.push(tank)

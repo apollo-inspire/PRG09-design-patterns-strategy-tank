@@ -1,9 +1,8 @@
-import { Tank }         from "../tank";
-import { Projectile }   from "./projectile";
-
+import { Tank } from "../tank";
+import { Projectile } from "./projectile";
 
 export class Bullet extends Projectile {
-    constructor(tank : Tank) {
-        super("bullet", tank)
+    constructor(tank: Tank, speed: number) {
+        super("bullet", tank, speed);
     }
 }
