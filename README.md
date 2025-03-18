@@ -1,3 +1,8 @@
+# Note by Lucas
+
+See classdiagram.mermaid/classdiagram.svg for the classdiagram of this project.
+
+
 # Strategy Tank
 
 Startercode voor de opdracht Strategy Tank [PRG09]

@@ -133,7 +133,7 @@ export class Tank extends GameObject {
     }
 
     onCollision(target: GameObject): void {
-        // throw new Error("Method not implemented.");
+
     }
 
     private keepInWindow() {
@@ -147,7 +147,7 @@ export class Tank extends GameObject {
      * Converts angle from degrees to radians
      * @param degrees angle in degrees
      */
-     protected degToRad(degrees : number) {
+    protected degToRad(degrees : number) {
         return degrees * Math.PI / 180
     }
 }

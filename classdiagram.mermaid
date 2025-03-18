@@ -1,95 +1,200 @@
 classDiagram
-    class GameObject
-
-    class Vector
-
-    class Ammunition {
-        - type: string
-        - position: Vector
-        + onCollision(target: GameObject): void
+    
+    class Vector {
+        + x: number
+        + y: number
+        + add(v: Vector): Vector
+        + scale(n: number): Vector
+        + normalize(): Vector
+        + magnitude(): number
+        + difference(v: Vector): Vector
+        + angle(): number
+        + getVectorFromAngle(angle : number): Vector
+        + getDirectionToObject(target : GameObject) : Vector
     }
 
-    class BulletAmmo
-    class MissileAmmo
-    class RocketAmmo
-
-    class Projectile {
-        - speed: number
-        - direction: Vector
-        + move(): void
-    }
-
-    class Bullet
-    class Missile
-    class Rocket
-
-    class ProjectileStrategy {
-        - fireRate: number
-        - speed: number
-        + createProjectile(Tank): Projectile
-    }
-
-    class BulletStrategy {
-        - fireRate: 500
-        - speed: 12
-        + createProjectile(Tank): Bullet
-    }
-
-    class MissileStrategy {
-        - fireRate: 3000
-        - speed: 6
-        + createProjectile(Tank): Missile
-    }
-
-    class RocketStrategy {
-        - fireRate: 2000
-        - speed: 8
-        + createProjectile(Tank): Rocket
-    }
-
-    class Tank {
-        - health: number
-        - position: Vector
-        + fire(): void
-    }
-
-    class Turret {
-        - angle: number
-        + rotate(): void
-    }
-
-    class Enemy {
-        - health: number
-        - position: Vector
-        + move(): void
-    }
+    %% Vector *-- Game
+    %% Vector *-- GameObject
+    %% Vector *-- Ammunition
+    %% Vector *-- Ammo
+    %% Vector *-- BulletAmmo
+    %% Vector *-- MissileAmmo
+    %% Vector *-- RocketAmmo
+    %% Vector *-- Projectile
+    %% Vector *-- Enemy
+    %% Vector *-- Tank
+    %% Vector *-- Turret
 
     class Game {
-        + start(): void
+        + gameObjects: GameObject[]
+        - gameLoop()
+        - checkCollision(): void
+    }
+
+    Game --o Tank
+    Game --o Enemy
+    Game --o Ammunition
+    Game --o Projectile
+    
+    class GameObject {
+        # div: HTMLElement
+        # position  : Vector
+        # rotation  : number
+        tag : string
         + update(): void
+        # draw(): void
+        + hasCollision(gameobject : GameObject) : boolean
+        # onCollision(target: GameObject): void
     }
 
     GameObject <|-- Ammunition
+    GameObject <|-- Enemy
+
+    class Ammunition {
+        type: string
+        position: Vector
+    }
+
+    Ammunition <|-- Ammo
     Ammunition <|-- BulletAmmo
     Ammunition <|-- MissileAmmo
     Ammunition <|-- RocketAmmo
 
-    GameObject <|-- Enemy
+    class Ammo {
+        type: string
+        position: Vector
+        - strategy: ProjectileStrategy;
+        + onCollision(target: GameObject): void
+    }
+
+    class BulletAmmo {
+        position: Vector
+    }
+    class MissileAmmo {
+        position: Vector
+    }
+    class RocketAmmo {
+        position: Vector
+    }
+
+    class Tank {
+        - currentProjectileStrategy: ProjectileStrategy;
+        - readonly FRICTION       : number
+        - readonly ACCELERATION   : number 
+        - turnLeft: boolean 
+        - turnRight: boolean
+        - accelerate: boolean
+        - backaccelerate: boolean
+        - canFire: boolean
+        - previousState: boolean
+        - rotationSpeed: number
+        - turret: Turret
+        - game: Game
+        - fireRate: number
+        # speed: Vector
+        + update()
+        - handleKeyDown(e : KeyboardEvent)
+        - handleKeyUp(e : KeyboardEvent)
+        - fire()
+        + changeAmmo(strategy: ProjectileStrategy)
+        - keepInWindow()
+        # degToRad(degrees : number)
+    }
+
+    Tank --o Turret
+    Tank ..> ProjectileStrategy
+
+    class Turret {
+        - tank : Tank
+        - speed : Vector
+        + update()
+    }
+
+
+    class Projectile {
+        - damage: number
+        - parentTurret: number
+        - direction: Vector
+        type: string
+        tank: Tank
+        speed: number
+        + update()
+    }
 
     Projectile <|-- Bullet
     Projectile <|-- Missile
     Projectile <|-- Rocket
 
+    BulletStrategy -- Bullet
+    MissileStrategy -- Missile
+    RocketStrategy -- Rocket
+
+    class Bullet {
+        tank: Tank
+        speed: number
+    }
+    class Missile {
+        tank: Tank
+        speed: number
+    }
+    class Rocket {
+        tank: Tank
+        speed: number
+    }
+
+    class ProjectileStrategy {
+        - lastFired: number
+        # fireRate: number
+        # speed: number
+        # createProjectile(tank: Tank): Projectile
+        fire(tank: Tank): Projectile | null
+    }
+
     ProjectileStrategy <|-- BulletStrategy
     ProjectileStrategy <|-- MissileStrategy
     ProjectileStrategy <|-- RocketStrategy
 
-    BulletStrategy --> Bullet
-    MissileStrategy --> Missile
-    RocketStrategy --> Rocket
 
-    Tank --> Turret : has
-    Tank --> ProjectileStrategy : uses
+    class BulletStrategy {
+        # fireRate: number
+        # speed: number
+        # createProjectile(tank: Tank): Bullet
+    }
+    class RocketStrategy {
+        # fireRate: number
+        # speed: number
+        # createProjectile(tank: Tank): Rocket
+    }
+    class MissileStrategy {
+        # fireRate: number
+        # speed: number
+        # createProjectile(tank: Tank): Missile
+    }
 
-    Game --> Tank : manages
-    Game --> Enemy : manages
+    
+
+    class Enemy {
+        - speed: number
+        - game: Game
+        - player: Tank
+        - type: string
+        position: Vector
+        + update()
+        + onCollision(target: GameObject): void 
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
